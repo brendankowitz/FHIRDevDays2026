@@ -55,6 +55,19 @@ dotnet run
 Loads a ViewDefinition, evaluates it over 20 patients, and prints the flattened rows.
 Source: [demo2-library/Program.cs](demo/demo2-library/Program.cs)
 
+### The payoff — a real clinical query
+
+Flattening is the means; the question is the end. Two closing demos join the flattened
+Parquet back together with plain SQL (DuckDB) to answer a clinical question:
+
+- **Diabetic registry** — Patient ⋈ Condition ⋈ HbA1c Observations → who's above the 7%
+  target and trending worse. See Beat 6 in [demo/demo1-cli-script.md](demo/demo1-cli-script.md).
+- **Growth chart** — height-for-age across a pediatric cohort → a population growth curve.
+  See [demo/demo-growth-chart.md](demo/demo-growth-chart.md).
+
+Both cohorts are generated with `ignixa-fakes` and committed under `demo/data/`. The demo
+scripts are [runme.dev](https://runme.dev/)-friendly — each command is a one-click cell in VS Code.
+
 ## 🔗 Learn more
 
 - **Ignixa.SqlOnFhir** on NuGet: [nuget.org/packages/Ignixa.SqlOnFhir](https://www.nuget.org/packages/Ignixa.SqlOnFhir)
