@@ -79,7 +79,7 @@ ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
 ignixa-fakes r4 population --out ./output --from Seattle --count 50 --ndjson
 ```
 
-**Expected:** Multiple NDJSON files in `./output/`: Patient, Condition, Encounter, Immunization, MedicationRequest — one file per resource type.
+**Expected:** Multiple NDJSON files in `./output/`, one per resource type: Patient, Condition, Encounter, Immunization, MedicationRequest — and, with `ignixa-fakes` 0.5.1+, Observation and DiagnosticReport (vitals and lab panels from wellness visits).
 
 **Say:** "Fifty patients. Separate NDJSON files per resource type — exactly the format that $import expects. And if you need more: just change the count. The patients you saw in the SQL on FHIR session? This is how they were generated."
 
