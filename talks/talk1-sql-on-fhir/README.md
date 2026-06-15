@@ -42,6 +42,7 @@ ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --form
 ```
 
 📜 Full walkthrough (preview → validate → run → batch): [demo/demo1-cli-script.md](demo/demo1-cli-script.md)
+🟢 Run it live in VS Code ([runme.dev](https://runme.dev/) one-click cells): [demo/demo1-runme.md](demo/demo1-runme.md)
 
 ### Demo 2 — Library (C#)
 

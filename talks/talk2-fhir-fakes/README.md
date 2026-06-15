@@ -44,6 +44,7 @@ ignixa-fakes r4 population --out ./output --from Seattle --count 50 --ndjson
 ```
 
 📜 Full walkthrough (resource → scenario → population): [demo/demo1-cli-script.md](demo/demo1-cli-script.md)
+🟢 Run it live in VS Code ([runme.dev](https://runme.dev/) one-click cells): [demo/demo1-runme.md](demo/demo1-runme.md)
 
 ### Demo 2 — Library (C#)
 
