@@ -11,7 +11,7 @@
 
 **Say:** "Let's start with `preview`. This shows the schema the ViewDefinition will produce — without touching any input data. Great for validating in CI."
 
-```sh {"name":"beat1-preview","cwd":"data"}
+```bash
 ignixa-sqlonfhir r4 preview --views patient-view.json
 ```
 
@@ -34,7 +34,7 @@ Resource: Patient  |  FHIR: R4  |  Columns: 5
 
 **Say:** "Add `--input` to pull sample rows through the evaluator."
 
-```sh {"name":"beat2-preview-rows","cwd":"data"}
+```bash
 ignixa-sqlonfhir r4 preview --views patient-view.json --input patients.ndjson --rows 5
 ```
 
@@ -71,7 +71,7 @@ birth_date | family_name | gender | given_name | id
 
 **Say:** "Before running in a pipeline, validate the ViewDefinition. This catches FHIRPath errors without touching data."
 
-```sh {"name":"beat3-validate","cwd":"data"}
+```bash
 ignixa-sqlonfhir r4 validate --views patient-view.json
 ```
 
@@ -91,7 +91,7 @@ ignixa-sqlonfhir r4 validate --views patient-view.json
 
 **Say:** "Now run it. The output format is inferred from the file extension."
 
-```sh {"name":"beat4-run-parquet","cwd":"data"}
+```bash
 ignixa-sqlonfhir r4 run \
   --views patient-view.json \
   --input patients.ndjson \
@@ -106,7 +106,7 @@ ignixa-sqlonfhir r4 run \
 
 **Say:** "Open it." [Open in DuckDB or any Parquet viewer]
 
-```sh {"name":"beat4-duckdb","cwd":"data"}
+```bash
 # If DuckDB is available:
 duckdb -c "SELECT * FROM 'patients.parquet' LIMIT 5;"
 ```
@@ -117,7 +117,7 @@ duckdb -c "SELECT * FROM 'patients.parquet' LIMIT 5;"
 
 **Say:** "In a real pipeline you have multiple ViewDefinitions and multiple resource types. Batch mode handles all of them in one command."
 
-```sh {"name":"beat5-batch","cwd":"data"}
+```bash
 ignixa-sqlonfhir r4 run \
   --views views/ \
   --input fhir-ndjson/ \
@@ -152,7 +152,7 @@ who's trending the wrong way?*"
 
 Flatten three resource types (Patient, Condition, the HbA1c Observations) to Parquet:
 
-```sh {"name":"beat6-flatten","cwd":"data/cohort"}
+```bash
 ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --format parquet
 ```
 
@@ -171,7 +171,7 @@ ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --form
 ViewDefinition's WHERE clause filtered them down to just the 36 HbA1c readings. Now the
 join — three flattened tables, plain SQL, in DuckDB."
 
-```sh {"name":"beat6-query","cwd":"data/cohort"}
+```bash
 duckdb -c ".read diabetic-cohort.sql"
 ```
 
