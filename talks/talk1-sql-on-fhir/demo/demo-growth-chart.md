@@ -4,7 +4,7 @@
 > then ask a real clinical question — but the answer is a **population growth curve**.
 >
 > Runnable with the [runme.dev](https://runme.dev/) VS Code extension: each `sh` cell below is
-> a one-click run. `cwd` is set per cell to the data folder.
+> a one-click run. Cells are self-anchoring (they `cd` to the right folder via git), so they run correctly from anywhere in the repo; output shows inline.
 >
 > **Data requirement:** the committed cohort was generated with `ignixa-fakes` **0.5.1+**
 > (0.5.0 population produced no observations). The flatten step works on `ignixa-sqlonfhir` 0.5.0+.
@@ -15,7 +15,8 @@
 
 *Flatten 60 synthetic patients and their height/weight observations into Parquet.*
 
-```sh {"name":"growth-flatten","cwd":"data/growth"}
+```sh {"name":"growth-flatten","interactive":false}
+cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data/growth"
 ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --format parquet
 ```
 
@@ -37,7 +38,8 @@ ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --form
 
 *Join height to patients, compute age at each measurement, and derive the median growth curve.*
 
-```sh {"name":"growth-query","cwd":"data/growth"}
+```sh {"name":"growth-query","interactive":false}
+cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data/growth"
 duckdb -c ".read growth-chart.sql"
 ```
 

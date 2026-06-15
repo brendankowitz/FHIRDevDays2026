@@ -3,6 +3,7 @@
 > Presentation version for [runme.dev](https://runme.dev/) — each cell below is a one-click run on stage.
 > For the full narrative, expected outputs, and beat timing see [`demo1-cli-script.md`](demo1-cli-script.md).
 > **Prerequisite:** `ignixa-fakes` installed and on PATH.
+> Cells are self-anchoring (they `cd` to the right folder via git), so they run correctly from anywhere in the repo; output shows inline.
 
 ---
 
@@ -10,7 +11,8 @@
 
 *Discover available scenarios and cities the CLI can generate.*
 
-```sh {"name":"beat1-discover","cwd":"."}
+```sh {"name":"beat1-discover","interactive":false}
+cd "$(git rev-parse --show-toplevel)/talks/talk2-fhir-fakes/demo"
 ignixa-fakes help scenarios
 ignixa-fakes help cities
 ```
@@ -21,7 +23,8 @@ ignixa-fakes help cities
 
 *Generate a single Patient resource seeded from Seattle.*
 
-```sh {"name":"beat2-resource","cwd":"."}
+```sh {"name":"beat2-resource","interactive":false}
+cd "$(git rev-parse --show-toplevel)/talks/talk2-fhir-fakes/demo"
 ignixa-fakes r4 resource Patient --out ./output --from Seattle
 ```
 
@@ -33,7 +36,8 @@ ignixa-fakes r4 resource Patient --out ./output --from Seattle
 
 *Generate a full DiabeticPatient scenario bundle with resolved references.*
 
-```sh {"name":"beat3-scenario","cwd":"."}
+```sh {"name":"beat3-scenario","interactive":false}
+cd "$(git rev-parse --show-toplevel)/talks/talk2-fhir-fakes/demo"
 ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
 ```
 
@@ -45,7 +49,8 @@ ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
 
 *Scale up to fifty patients as NDJSON, ready for `$import` or a SQL on FHIR pipeline.*
 
-```sh {"name":"beat4-population","cwd":"."}
+```sh {"name":"beat4-population","interactive":false}
+cd "$(git rev-parse --show-toplevel)/talks/talk2-fhir-fakes/demo"
 ignixa-fakes r4 population --out ./output --from Seattle --count 50 --ndjson
 ```
 
