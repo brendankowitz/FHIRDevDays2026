@@ -8,7 +8,7 @@
 
 ## Beat 1 — Discover what's available
 
-**Say:** "Let's see what the CLI can generate — scenarios and cities."
+*Discover available scenarios and cities the CLI can generate.*
 
 ```sh {"name":"beat1-discover","cwd":"."}
 ignixa-fakes help scenarios
@@ -19,7 +19,7 @@ ignixa-fakes help cities
 
 ## Beat 2 — Single patient resource
 
-**Say:** "Start simple — one Patient resource, seeded from Seattle."
+*Generate a single Patient resource seeded from Seattle.*
 
 ```sh {"name":"beat2-resource","cwd":"."}
 ignixa-fakes r4 resource Patient --out ./output --from Seattle
@@ -31,7 +31,7 @@ ignixa-fakes r4 resource Patient --out ./output --from Seattle
 
 ## Beat 3 — Clinical scenario
 
-**Say:** "Now a full clinical scenario — diabetic patient with complete context and resolved references."
+*Generate a full DiabeticPatient scenario bundle with resolved references.*
 
 ```sh {"name":"beat3-scenario","cwd":"."}
 ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
@@ -43,7 +43,7 @@ ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
 
 ## Beat 4 — Population as NDJSON
 
-**Say:** "Scale it up — fifty patients as NDJSON, ready for `$import` or a SQL on FHIR pipeline."
+*Scale up to fifty patients as NDJSON, ready for `$import` or a SQL on FHIR pipeline.*
 
 ```sh {"name":"beat4-population","cwd":"."}
 ignixa-fakes r4 population --out ./output --from Seattle --count 50 --ndjson

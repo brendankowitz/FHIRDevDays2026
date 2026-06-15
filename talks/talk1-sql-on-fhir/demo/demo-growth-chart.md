@@ -13,8 +13,7 @@
 
 ## Beat A: Flatten patients + height/weight observations (~30s)
 
-**Say:** "A population of 60 synthetic patients, each simulated from birth with vitals at every
-wellness visit. Let's flatten the patients and their height and weight measurements."
+*Flatten 60 synthetic patients and their height/weight observations into Parquet.*
 
 ```sh {"name":"growth-flatten","cwd":"data/growth"}
 ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --format parquet
@@ -30,14 +29,13 @@ ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --form
 ✓ Done: 2 completed, 0 skipped, 0 failed
 ```
 
-**Say:** "The observation view's WHERE clause already filtered to just body height and weight."
+*The observation view's WHERE clause pre-filtered to body height and weight only.*
 
 ---
 
 ## Beat B: The growth curve (~45s)
 
-**Say:** "Now join height back to each patient, compute age at each measurement, and take the
-median by age. Watch a growth curve fall out of FHIR data."
+*Join height to patients, compute age at each measurement, and derive the median growth curve.*
 
 ```sh {"name":"growth-query","cwd":"data/growth"}
 duckdb -c ".read growth-chart.sql"
@@ -60,9 +58,7 @@ duckdb -c ".read growth-chart.sql"
 └───────────┴──────────────┴──────────────────┴─────────────┴────────────┘
 ```
 
-**Say:** "Median height climbs smoothly from 75cm at age one to adult height, then plateaus —
-a textbook growth curve, straight out of FHIR with a ViewDefinition and one SQL query. No ETL,
-no JVM. The same pipeline that built the diabetic registry builds a growth chart."
+*Median height climbs from 75cm at age one to adult height — a textbook growth curve from FHIR, one ViewDefinition, one SQL query.*
 
 ---
 

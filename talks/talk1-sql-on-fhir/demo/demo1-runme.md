@@ -8,7 +8,7 @@ Full narrative, beat-by-beat cues, and expected outputs live in [demo1-cli-scrip
 
 ## Beat 1 — Preview schema
 
-**Say:** "Preview shows the schema the ViewDefinition will produce — no input data required."
+*Preview the output schema the ViewDefinition will produce — no input data required.*
 
 ```sh {"name":"beat1-preview","cwd":"data"}
 ignixa-sqlonfhir r4 preview --views patient-view.json
@@ -18,7 +18,7 @@ ignixa-sqlonfhir r4 preview --views patient-view.json
 
 ## Beat 2 — Preview with sample rows
 
-**Say:** "Add `--input` to pull sample rows through the evaluator."
+*Add `--input` to pull sample rows through the evaluator.*
 
 ```sh {"name":"beat2-preview-rows","cwd":"data"}
 ignixa-sqlonfhir r4 preview --views patient-view.json --input patients.ndjson --rows 5
@@ -30,7 +30,7 @@ ignixa-sqlonfhir r4 preview --views patient-view.json --input patients.ndjson --
 
 ## Beat 3 — Validate
 
-**Say:** "Validate catches FHIRPath errors before a pipeline run — no data needed."
+*Validate catches FHIRPath errors before a pipeline run — no data needed.*
 
 ```sh {"name":"beat3-validate","cwd":"data"}
 ignixa-sqlonfhir r4 validate --views patient-view.json
@@ -40,7 +40,7 @@ ignixa-sqlonfhir r4 validate --views patient-view.json
 
 ## Beat 4 — Run to Parquet
 
-**Say:** "Output format is inferred from the file extension."
+*Output format is inferred from the file extension — `.parquet` selects Parquet automatically.*
 
 ```sh {"name":"beat4-run-parquet","cwd":"data"}
 ignixa-sqlonfhir r4 run \
@@ -57,7 +57,7 @@ duckdb -c "SELECT * FROM 'patients.parquet' LIMIT 5;"
 
 ## Beat 5 — Batch mode
 
-**Say:** "Multiple ViewDefinitions, multiple resource types — one command."
+*Run multiple ViewDefinitions across multiple resource types in a single command.*
 
 ```sh {"name":"beat5-batch","cwd":"data"}
 ignixa-sqlonfhir r4 run \
@@ -74,7 +74,7 @@ ignixa-sqlonfhir r4 run \
 
 ## Beat 6 — The payoff: diabetic cohort registry
 
-**Say:** "ViewDefinitions flatten; SQL asks the clinical question — which diabetics are above 7% HbA1c and trending the wrong way?"
+*ViewDefinitions flatten the FHIR data; the SQL query identifies diabetics above 7% HbA1c and trending the wrong way.*
 
 ```sh {"name":"beat6-flatten","cwd":"data/cohort"}
 ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --format parquet
