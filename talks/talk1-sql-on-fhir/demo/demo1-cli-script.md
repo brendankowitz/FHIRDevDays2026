@@ -141,6 +141,65 @@ ignixa-sqlonfhir r4 run \
 
 ---
 
+## Beat 6: The payoff — a real clinical query (~60s)
+
+**Say:** "Flattening is the means, not the end. Here's the point of all this. I've got a
+diabetic cohort — generated with Ignixa.FhirFakes — and I want to answer a question a care
+manager actually asks: *which of my diagnosed diabetics are above the 7% HbA1c target, and
+who's trending the wrong way?*"
+
+**Working directory:** `talks/talk1-sql-on-fhir/demo/data/cohort/`
+
+Flatten three resource types (Patient, Condition, the HbA1c Observations) to Parquet:
+
+```bash
+ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --format parquet
+```
+
+**Expected output:**
+```
+✓ Found 3 ViewDefinition(s)  [R4]
+
+  [1/3] condition-view                                  12 rows  condition-view.parquet (0.0 MB)  0.3s
+  [2/3] observation-view                                36 rows  observation-view.parquet (0.0 MB)  0.1s
+  [3/3] patient-view                                    18 rows  patient-view.parquet (0.0 MB)  0.0s
+
+✓ Done: 3 completed, 0 skipped, 0 failed
+```
+
+**Say:** "Look at the observation view — 18 patients produced 186 observations, and the
+ViewDefinition's WHERE clause filtered them down to just the 36 HbA1c readings. Now the
+join — three flattened tables, plain SQL, in DuckDB."
+
+```bash
+duckdb -c ".read diabetic-cohort.sql"
+```
+
+**Expected output:**
+```
+┌──────────────────┬─────────────┬──────────────┬────────┬───────────┬──────────────┐
+│     patient      │ first_hba1c │ latest_hba1c │ change │   trend   │    status    │
+├──────────────────┼─────────────┼──────────────┼────────┼───────────┼──────────────┤
+│ Cameron Schuppe  │         7.9 │          8.5 │    0.6 │ worsening │ ABOVE target │
+│ Dan Fay          │         7.8 │          8.4 │    0.6 │ worsening │ ABOVE target │
+│ ...              │             │              │        │           │              │
+│ Cory Senger      │         8.4 │          7.6 │   -0.8 │ improving │ ABOVE target │
+│ Carroll Johnston │         7.6 │          7.5 │   -0.1 │ improving │ ABOVE target │
+└──────────────────┴─────────────┴──────────────┴────────┴───────────┴──────────────┘
+12 rows
+```
+
+**Say:** "Twelve diabetics — the six healthy patients dropped out, because the join only
+keeps patients with a diabetes condition. Every one is above target, and more than half are
+trending worse. *That's* the outreach list. FHIR went in; a clinical registry came out — no
+ETL service, no JVM, just ViewDefinitions and SQL."
+
+> **Optional pre-step (don't do live):** the cohort was generated entirely with
+> `ignixa-fakes` — see [`data/cohort/regenerate.md`](data/cohort/regenerate.md). The data is
+> committed, so on the day it's already there; the doc just shows how it was made.
+
+---
+
 ## Fallback plan
 
 If the CLI fails or produces unexpected output:
@@ -159,5 +218,6 @@ If the CLI fails or produces unexpected output:
 - [ ] `views/` has 3 files (patient-view.json, encounter-view.json, condition-view.json)
 - [ ] `fhir-ndjson/` has 3 files (Patient.ndjson, Condition.ndjson, Encounter.ndjson)
 - [ ] `output/` directory exists and is **empty** (clear it before the talk)
-- [ ] DuckDB installed if using the Parquet viewer step (optional — skip Beat 4 open if not available)
+- [ ] **DuckDB installed** — required for Beat 6's join query (`duckdb` on PATH); also used by Beat 4's optional Parquet viewer
+- [ ] Beat 6: `cohort/fhir-ndjson/` has Patient/Condition/Observation NDJSON; `cohort/output/` is empty; `duckdb -c ".read diabetic-cohort.sql"` runs from `cohort/`
 - [ ] Terminal font is at least 24pt

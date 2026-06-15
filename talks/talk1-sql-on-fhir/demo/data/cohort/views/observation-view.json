@@ -1,0 +1,22 @@
+{
+  "resourceType": "ViewDefinition",
+  "resource": "Observation",
+  "constant": [
+    { "name": "hba1c_code", "valueString": "4548-4" }
+  ],
+  "select": [
+    {
+      "column": [
+        { "name": "observation_id", "path": "getResourceKey()",                                          "type": "string"  },
+        { "name": "patient_id",     "path": "subject.getReferenceKey(Patient)",                          "type": "string"  },
+        { "name": "loinc_code",     "path": "code.coding.where(system='http://loinc.org').first().code",  "type": "string"  },
+        { "name": "test_date",      "path": "effective.ofType(dateTime)",                                 "type": "dateTime" },
+        { "name": "hba1c_value",    "path": "value.ofType(Quantity).value",                              "type": "decimal" },
+        { "name": "unit",           "path": "value.ofType(Quantity).unit",                               "type": "string"  }
+      ]
+    }
+  ],
+  "where": [
+    { "path": "code.coding.exists(system='http://loinc.org' and code=%hba1c_code)" }
+  ]
+}

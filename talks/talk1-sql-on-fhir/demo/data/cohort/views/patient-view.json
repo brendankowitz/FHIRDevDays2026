@@ -1,0 +1,15 @@
+{
+  "resourceType": "ViewDefinition",
+  "resource": "Patient",
+  "select": [
+    {
+      "column": [
+        { "name": "patient_id",  "path": "getResourceKey()",                                  "type": "string" },
+        { "name": "family_name", "path": "name.where(use='official').first().family",         "type": "string" },
+        { "name": "given_name",  "path": "name.where(use='official').first().given.first()",  "type": "string" },
+        { "name": "birth_date",  "path": "birthDate",                                         "type": "date"   },
+        { "name": "gender",      "path": "gender",                                            "type": "string" }
+      ]
+    }
+  ]
+}
