@@ -11,7 +11,7 @@
 
 **Say:** "Let's start by seeing what the CLI can do."
 
-```bash
+```sh {"name":"beat1-discover","cwd":"."}
 ignixa-fakes help scenarios
 ignixa-fakes help cities
 ```
@@ -47,7 +47,7 @@ Found 14 cities across 11 states:
 
 **Say:** "Start simple. One Patient from Seattle."
 
-```bash
+```sh {"name":"beat2-resource","cwd":"."}
 ignixa-fakes r4 resource Patient --out ./output --from Seattle
 ```
 
@@ -61,7 +61,7 @@ ignixa-fakes r4 resource Patient --out ./output --from Seattle
 
 **Say:** "Now a full clinical scenario — a diabetic patient with complete context."
 
-```bash
+```sh {"name":"beat3-scenario","cwd":"."}
 ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
 ```
 
@@ -75,7 +75,7 @@ ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
 
 **Say:** "Now scale it. A population ready for $import or a SQL on FHIR pipeline."
 
-```bash
+```sh {"name":"beat4-population","cwd":"."}
 ignixa-fakes r4 population --out ./output --from Seattle --count 50 --ndjson
 ```
 
