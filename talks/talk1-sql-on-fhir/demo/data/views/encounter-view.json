@@ -1,0 +1,17 @@
+{
+  "resourceType": "ViewDefinition",
+  "resource": "Encounter",
+  "select": [
+    {
+      "column": [
+        { "name": "id",           "path": "id",                                 "type": "string" },
+        { "name": "patient_id",   "path": "subject.reference",                  "type": "string" },
+        { "name": "status",       "path": "status",                             "type": "string" },
+        { "name": "class_code",   "path": "class.code",                         "type": "string" },
+        { "name": "type_code",    "path": "type.first().coding.first().code",   "type": "string" },
+        { "name": "type_display", "path": "type.first().coding.first().display","type": "string" },
+        { "name": "start_date",   "path": "period.start",                       "type": "dateTime" }
+      ]
+    }
+  ]
+}

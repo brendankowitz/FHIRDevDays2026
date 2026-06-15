@@ -1,0 +1,16 @@
+{
+  "resourceType": "ViewDefinition",
+  "resource": "Condition",
+  "select": [
+    {
+      "column": [
+        { "name": "id",              "path": "id",                                     "type": "string" },
+        { "name": "patient_id",      "path": "subject.reference",                      "type": "string" },
+        { "name": "code",            "path": "code.coding.first().code",               "type": "string" },
+        { "name": "display",         "path": "code.coding.first().display",            "type": "string" },
+        { "name": "onset_date",      "path": "onsetDateTime",                          "type": "date"   },
+        { "name": "clinical_status", "path": "clinicalStatus.coding.first().code",     "type": "string" }
+      ]
+    }
+  ]
+}
