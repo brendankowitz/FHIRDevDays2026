@@ -1,0 +1,13 @@
+{
+  "resourceType": "ViewDefinition",
+  "resource": "Patient",
+  "select": [
+    {
+      "column": [
+        { "name": "patient_id", "path": "getResourceKey()", "type": "string" },
+        { "name": "birth_date", "path": "birthDate",         "type": "date"   },
+        { "name": "gender",     "path": "gender",            "type": "string" }
+      ]
+    }
+  ]
+}

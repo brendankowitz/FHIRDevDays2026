@@ -11,7 +11,7 @@ reference/
 # Demo output directories — clear before each talk, do not commit generated files
 talks/*/demo/output/
 talks/talk1-sql-on-fhir/demo/data/output/
-talks/talk1-sql-on-fhir/demo/data/cohort/output/
+talks/talk1-sql-on-fhir/demo/data/**/output/
 talks/talk1-sql-on-fhir/demo/data/**/*.parquet
 
 # User-specific files
