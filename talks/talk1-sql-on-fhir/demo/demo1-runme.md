@@ -90,4 +90,22 @@ duckdb -c ".read ./data/cohort/diabetic-cohort.sql"
 
 ---
 
+## Beat 7 — One view, any lab: runtime variables
+
+*The cohort Observation view filters on a `%hba1c_code` constant (default `4548-4`). Pass `--var` to repoint the **same** ViewDefinition at a different lab — no file edit.*
+
+```sh {"name":"beat7-default","interactive":false}
+ignixa-sqlonfhir r4 preview --views ./data/cohort/views/observation-view.json --input ./data/cohort/fhir-ndjson/Observation.ndjson --rows 3
+```
+
+*Default constant → HbA1c (LOINC `4548-4`), values in `%`.*
+
+```sh {"name":"beat7-override","interactive":false}
+ignixa-sqlonfhir r4 preview --views ./data/cohort/views/observation-view.json --input ./data/cohort/fhir-ndjson/Observation.ndjson --rows 3 --var hba1c_code=2339-0
+```
+
+*Same view, `--var hba1c_code=2339-0` → glucose (LOINC `2339-0`), values in `mg/dL`. One ViewDefinition, any lab, decided at runtime.*
+
+---
+
 **Alternative payoff:** see [demo-growth-chart.md](demo-growth-chart.md) for the population growth curve demo (same pipeline, different clinical question).
