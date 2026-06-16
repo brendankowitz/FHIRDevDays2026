@@ -80,4 +80,27 @@ if (population.Count > 0)
 Console.WriteLine();
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Layer 5 — Extensibility: compose your OWN scenario
+// ─────────────────────────────────────────────────────────────────────────────
+// The built-in CommonScenarios.* helpers are just Func<ScenarioBuilder, ScenarioBuilder> —
+// so anything you write is a first-class scenario too. Plug it in with AddSubScenario.
+Console.WriteLine("=== Layer 5: Extensibility (bring your own scenario) ===");
+
+var customContext = new ScenarioBuilder(schemaProvider)
+    .WithPatient(p => p.WithAge(58).WithGender(g => g.Female))
+    .AddSubScenario(AnnualDiabeticReview(), "My custom scenario")
+    .Build();
+
+Console.WriteLine($"Scenario    : AnnualDiabeticReview (user-defined)");
+Console.WriteLine($"Encounters  : {customContext.Encounters.Count}");
+Console.WriteLine($"Observations: {customContext.Observations.Count}");
+Console.WriteLine($"Total resources: {customContext.AllResources.Count}");
+Console.WriteLine();
+
+// ─────────────────────────────────────────────────────────────────────────────
 Console.WriteLine("Talk 2 demo complete.");
+
+// A reusable, user-defined scenario — exactly the shape of the built-in CommonScenarios.* helpers.
+static Func<ScenarioBuilder, ScenarioBuilder> AnnualDiabeticReview() => sb => sb
+    .AddEncounter(reason: "Annual diabetic review")
+    .AddSubScenario(CommonScenarios.RecordVitalSigns(), "Vitals");

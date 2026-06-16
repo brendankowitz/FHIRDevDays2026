@@ -68,6 +68,21 @@ void Main()
         FirstPatientResources = first?.AllResources.Count ?? 0
     }.Dump("Layer 4 — Population Generator");
 
+    // ── Layer 5 — Extensibility: compose your OWN scenario ────────────────────
+    // The built-in CommonScenarios.* helpers are just Func<ScenarioBuilder, ScenarioBuilder> —
+    // so anything you write is a first-class scenario too. Plug it in with AddSubScenario.
+    var customContext = new ScenarioBuilder(schemaProvider)
+        .WithPatient(p => p.WithAge(58).WithGender(g => g.Female))
+        .AddSubScenario(AnnualDiabeticReview(), "My custom scenario")
+        .Build();
+    new
+    {
+        Scenario = "AnnualDiabeticReview (user-defined)",
+        Encounters = customContext.Encounters.Count,
+        Observations = customContext.Observations.Count,
+        TotalResources = customContext.AllResources.Count
+    }.Dump("Layer 5 — Extensibility (bring your own scenario)");
+
     "Talk 2 demo complete.".Dump();
 }
 
@@ -79,3 +94,8 @@ static string GeneratePatientWithSeed(IFhirSchemaProvider schema, int seed)
     var patient = faker.Generate("Patient");
     return patient.Id;
 }
+
+// A reusable, user-defined scenario — exactly the shape of the built-in CommonScenarios.* helpers.
+static Func<ScenarioBuilder, ScenarioBuilder> AnnualDiabeticReview() => sb => sb
+    .AddEncounter(reason: "Annual diabetic review")
+    .AddSubScenario(CommonScenarios.RecordVitalSigns(), "Vitals");
