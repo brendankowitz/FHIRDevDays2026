@@ -38,7 +38,7 @@ ignixa-fakes r4 resource Patient --out ./output --from Seattle
 ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
 ```
 
-*Look for `r4-bundle-DiabeticPatient-{id}.json` — Patient, Conditions, Medications, Encounters.*
+*Look for `r4-bundle-DiabeticPatient-{id}.json` — Patient, Conditions, Medications, Encounters, Observations.*
 
 ---
 

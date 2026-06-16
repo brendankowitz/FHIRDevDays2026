@@ -65,7 +65,7 @@ ignixa-fakes r4 resource Patient --out ./output --from Seattle
 ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
 ```
 
-**Expected:** A `r4-bundle-DiabeticPatient-{id}.json` containing Patient + Conditions + Medications + Encounters. Open it and walk through the bundle entries.
+**Expected:** A `r4-bundle-DiabeticPatient-{id}.json` containing Patient + Conditions + Medications + Encounters + Observations. Open it and walk through the bundle entries.
 
 **Say:** "One command. A complete clinical picture. Patient, conditions, medications, encounters — all referenced correctly. `--resolved-references` gives you a batch bundle you can POST directly to a FHIR server."
 
