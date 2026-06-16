@@ -1,9 +1,8 @@
 # Demo 1 — SQL on FHIR CLI (runme.dev)
 
 Presentation version — one-click cells for live stage execution.
-Full narrative, beat-by-beat cues, and expected outputs live in [demo1-cli-script.md](demo1-cli-script.md).
 **Prerequisites:** `ignixa-sqlonfhir` and `duckdb` installed and on PATH.
-Cells are self-anchoring (they `cd` to the right folder via git), so they run correctly from anywhere in the repo; output shows inline.
+Run these cells from the `demo/` folder (runme's default — it's where this file lives). Paths are relative to that folder; `"interactive":false` renders output inline.
 
 ---
 
@@ -12,8 +11,7 @@ Cells are self-anchoring (they `cd` to the right folder via git), so they run co
 *Preview the output schema the ViewDefinition will produce — no input data required.*
 
 ```sh {"name":"beat1-preview","interactive":false}
-cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data"
-ignixa-sqlonfhir r4 preview --views patient-view.json
+ignixa-sqlonfhir r4 preview --views ./data/patient-view.json
 ```
 
 ---
@@ -23,8 +21,7 @@ ignixa-sqlonfhir r4 preview --views patient-view.json
 *Add `--input` to pull sample rows through the evaluator.*
 
 ```sh {"name":"beat2-preview-rows","interactive":false}
-cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data"
-ignixa-sqlonfhir r4 preview --views patient-view.json --input patients.ndjson --rows 5
+ignixa-sqlonfhir r4 preview --views ./data/patient-view.json --input ./data/patients.ndjson --rows 5
 ```
 
 *5 rows from the synthetic Seattle patient cohort.*
@@ -36,8 +33,7 @@ ignixa-sqlonfhir r4 preview --views patient-view.json --input patients.ndjson --
 *Validate catches FHIRPath errors before a pipeline run — no data needed.*
 
 ```sh {"name":"beat3-validate","interactive":false}
-cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data"
-ignixa-sqlonfhir r4 validate --views patient-view.json
+ignixa-sqlonfhir r4 validate --views ./data/patient-view.json
 ```
 
 ---
@@ -47,16 +43,14 @@ ignixa-sqlonfhir r4 validate --views patient-view.json
 *Output format is inferred from the file extension — `.parquet` selects Parquet automatically.*
 
 ```sh {"name":"beat4-run-parquet","interactive":false}
-cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data"
 ignixa-sqlonfhir r4 run \
-  --views patient-view.json \
-  --input patients.ndjson \
-  --out patients.parquet
+  --views ./data/patient-view.json \
+  --input ./data/patients.ndjson \
+  --out ./data/patients.parquet
 ```
 
 ```sh {"name":"beat4-duckdb","interactive":false}
-cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data"
-duckdb -c "SELECT * FROM 'patients.parquet' LIMIT 5;"
+duckdb -c "SELECT * FROM './data/patients.parquet' LIMIT 5;"
 ```
 
 ---
@@ -66,13 +60,12 @@ duckdb -c "SELECT * FROM 'patients.parquet' LIMIT 5;"
 *Run multiple ViewDefinitions across multiple resource types in a single command.*
 
 ```sh {"name":"beat5-batch","interactive":false}
-cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data"
 ignixa-sqlonfhir r4 run \
-  --views views/ \
-  --input fhir-ndjson/ \
-  --out output/ \
+  --views ./data/views/ \
+  --input ./data/fhir-ndjson/ \
+  --out ./data/output/ \
   --format parquet \
-  --stats-out output/stats.json
+  --stats-out ./data/output/stats.json
 ```
 
 *3 ViewDefinitions → 3 Parquet files; 376 encounters flattened.*
@@ -83,14 +76,14 @@ ignixa-sqlonfhir r4 run \
 
 *ViewDefinitions flatten the FHIR data; the SQL query identifies diabetics above 7% HbA1c and trending the wrong way.*
 
+Same convention as the other beats — run from `demo/`, `./data/…` paths, no `cd`. The flatten writes Parquet to `output/` and the shared `diabetic-cohort.sql` reads from `output/`, so both land in `demo/output/`.
+
 ```sh {"name":"beat6-flatten","interactive":false}
-cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data/cohort"
-ignixa-sqlonfhir r4 run --views views/ --input fhir-ndjson/ --out output/ --format parquet
+ignixa-sqlonfhir r4 run --views ./data/cohort/views/ --input ./data/cohort/fhir-ndjson/ --out output/ --format parquet
 ```
 
 ```sh {"name":"beat6-query","interactive":false}
-cd "$(git rev-parse --show-toplevel)/talks/talk1-sql-on-fhir/demo/data/cohort"
-duckdb -c ".read diabetic-cohort.sql"
+duckdb -c ".read ./data/cohort/diabetic-cohort.sql"
 ```
 
 *12 diabetics above target, trend column shows who needs outreach.*
