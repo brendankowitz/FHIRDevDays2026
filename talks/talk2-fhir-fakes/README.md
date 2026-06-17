@@ -2,7 +2,7 @@
 ### .NET Synthetic FHIR Data for Developer Happiness
 
 > **DevDays 2026** · Community Talk · 20–25 min
-> Built on [Ignixa v0.5.0](https://github.com/brendankowitz/ignixa-fhir)
+> Built on [Ignixa v0.5.6](https://github.com/brendankowitz/ignixa-fhir)
 
 Every FHIR developer hits the same wall: you need realistic test data, and every option is
 unsatisfying — hand-crafted JSON breaks, production data is a compliance nightmare, and
@@ -65,11 +65,7 @@ fluent `ScenarioBuilder`, a full metabolic-syndrome lifecycle, a population coho
 bring-your-own-scenario extensibility layer, and **Layer 6** adversarial edge-cases with a
 replayable mutation manifest. Source: [demo2-library/Program.cs](demo/demo2-library/Program.cs)
 
-> ⚠️ **Local main build (temporary):** the edge-case/seeding API ([PR #283](https://github.com/brendankowitz/ignixa-fhir/pull/283))
-> is merged to main but **not yet published to NuGet** (release is a manual workflow).
-> The demo pins a local build of main via [`demo2-library/nuget.config`](demo/demo2-library/nuget.config);
-> the `.linq` version needs that same folder added as a LINQPad package source (Preferences → NuGet,
-> show pre-release). Reset both to the published version (≥ 0.5.3) once a release is cut.
+> Requires **Ignixa 0.5.6+** (the edge-case / seeding API, [PR #283](https://github.com/brendankowitz/ignixa-fhir/pull/283)).
 
 ## 🔗 Learn more
 

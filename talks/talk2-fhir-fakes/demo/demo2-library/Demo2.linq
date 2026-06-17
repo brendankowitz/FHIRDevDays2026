@@ -1,6 +1,6 @@
 <Query Kind="Program">
-  <NuGetReference Version="0.5.3--no-branch-.2">Ignixa.FhirFakes</NuGetReference>
-  <NuGetReference Version="0.5.3--no-branch-.2">Ignixa.Specification</NuGetReference>
+  <NuGetReference Version="0.5.6">Ignixa.FhirFakes</NuGetReference>
+  <NuGetReference Version="0.5.6">Ignixa.Specification</NuGetReference>
   <Namespace>Ignixa.Abstractions</Namespace>
   <Namespace>Ignixa.FhirFakes</Namespace>
   <Namespace>Ignixa.FhirFakes.Builders</Namespace>
@@ -12,12 +12,7 @@
 </Query>
 
 // LINQPad version of the Talk 2 library demo (mirror of Program.cs).
-//
-// TEMPORARY: the pinned versions above are a local build of main (PR #283 merged,
-// not yet published to NuGet). One-time LINQPad setup — Preferences → NuGet → "Add package source":
-//   C:\Src\ignixa-fhir\.local-nupkg   (and tick "Show pre-release packages")
-// Once a release is cut, reset both refs to the published version (>= 0.5.3).
-//
+// Requires Ignixa 0.5.6+ (the edge-case / seeding API).
 // Press F4 to confirm the NuGet refs, then hit ▶. Each layer .Dump()s its result.
 
 void Main()
