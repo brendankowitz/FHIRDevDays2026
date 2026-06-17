@@ -1,6 +1,6 @@
 # Demo 1 — CLI Script
 
-**Time budget:** 3 minutes
+**Time budget:** 4 minutes
 **Output directory:** `./output/` (create fresh before talk — must be empty or non-existent)
 **Pre-demo:** Confirm `ignixa-fakes --version` prints a version number.
 **Terminal font:** 24pt minimum. High-contrast theme.
@@ -82,6 +82,44 @@ ignixa-fakes r4 population --out ./output --from Seattle --count 50 --ndjson
 **Expected:** Multiple NDJSON files in `./output/`, one per resource type: Patient, Condition, Encounter, Immunization, MedicationRequest — and, with `ignixa-fakes` 0.5.1+, Observation and DiagnosticReport (vitals and lab panels from wellness visits).
 
 **Say:** "Fifty patients. Separate NDJSON files per resource type — exactly the format that $import expects. And if you need more: just change the count. The patients you saw in the SQL on FHIR session? This is how they were generated."
+
+---
+
+## Beat 5: Adversarial data — Layer 6 (~60s)
+
+**Say:** "Every layer so far makes data that *behaves*. This one makes data that *misbehaves* — on purpose. Same realistic patient, then a seeded pass perturbs the free-text and dates: unicode and right-to-left names, boundary dates, max-length and injection-like strings."
+
+```bash
+ignixa-fakes r4 resource Patient --out ./output --from Seattle --edge-cases --seed 7 --validate
+```
+
+**Expected:** a patient JSON, a `*.manifest.json` sidecar listing every mutation, a per-category summary, and — the point — **it still validates**:
+```
+  Edge cases: seed=7, mutations=12
+    temporal.year-boundary: 1
+    unicode.multi-script-long: 2
+    unicode.cjk: 2
+    unicode.rtl: 3
+    string.injection-like: 1
+    string.max-length: 1
+    ...
+✓ Validation passed
+```
+
+**Say:** "Valid-but-hostile by default. The manifest records every before/after, seeded — so it's fully replayable. Now watch what happens when I ask for *intentionally invalid* data."
+
+```bash
+ignixa-fakes r4 resource Patient --out ./output --edge-cases --include-invalid --seed 99 --validate
+```
+
+**Expected:** the validator now **rejects** it:
+```
+  Status: ✗ INVALID
+❌ ERROR  @ Patient.name[0].given[0]
+   type-1: value must not be empty for FHIR type 'string'
+```
+
+**Say:** "That empty-string error is the punchline. Turning this on found a real bug in our *own* FHIR validator — it used to accept empty-but-present primitives and impossible calendar dates like the 31st of February. We fixed it in the same PR. Layer 5 proves your *good* data is correct. Layer 6 proves your *pipeline* survives *bad* data — and the first pipeline it broke was ours."
 
 ---
 

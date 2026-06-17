@@ -1,10 +1,10 @@
 <Query Kind="Program">
-  <NuGetReference Version="35.6.5">Bogus</NuGetReference>
-  <NuGetReference Version="0.5.0">Ignixa.FhirFakes</NuGetReference>
-  <NuGetReference Version="0.5.0">Ignixa.Specification</NuGetReference>
-  <Namespace>Bogus</Namespace>
+  <NuGetReference Version="0.5.3--no-branch-.2">Ignixa.FhirFakes</NuGetReference>
+  <NuGetReference Version="0.5.3--no-branch-.2">Ignixa.Specification</NuGetReference>
   <Namespace>Ignixa.Abstractions</Namespace>
   <Namespace>Ignixa.FhirFakes</Namespace>
+  <Namespace>Ignixa.FhirFakes.Builders</Namespace>
+  <Namespace>Ignixa.FhirFakes.EdgeCases</Namespace>
   <Namespace>Ignixa.FhirFakes.Lifecycle</Namespace>
   <Namespace>Ignixa.FhirFakes.Population</Namespace>
   <Namespace>Ignixa.FhirFakes.Scenarios</Namespace>
@@ -12,6 +12,12 @@
 </Query>
 
 // LINQPad version of the Talk 2 library demo (mirror of Program.cs).
+//
+// TEMPORARY: the pinned versions above are a local build of main (PR #283 merged,
+// not yet published to NuGet). One-time LINQPad setup — Preferences → NuGet → "Add package source":
+//   C:\Src\ignixa-fhir\.local-nupkg   (and tick "Show pre-release packages")
+// Once a release is cut, reset both refs to the published version (>= 0.5.3).
+//
 // Press F4 to confirm the NuGet refs, then hit ▶. Each layer .Dump()s its result.
 
 void Main()
@@ -20,13 +26,15 @@ void Main()
     var schemaProvider = FhirVersion.R4.GetSchemaProvider();
 
     // ── Layer 1 — Seeded Determinism ──────────────────────────────────────────
-    var id1a = GeneratePatientWithSeed(schemaProvider, 42);
-    var id1b = GeneratePatientWithSeed(schemaProvider, 42);
+    // First-class seeding (PR #283): seed goes straight to the faker — no global
+    // Randomizer.Seed static. Same seed => byte-identical JSON (excl. meta.lastUpdated).
+    var json1a = GeneratePatientJson(schemaProvider, 42);
+    var json1b = GeneratePatientJson(schemaProvider, 42);
     new
     {
-        Run1_seed42 = id1a,
-        Run2_seed42 = id1b,
-        Deterministic = id1a == id1b
+        Run1_chars = json1a.Length,
+        Run2_chars = json1b.Length,
+        ByteIdentical_exclMeta = json1a == json1b
     }.Dump("Layer 1 — Seeded Determinism");
 
     // ── Layer 2 — ScenarioBuilder (patient journey composition) ───────────────
@@ -83,16 +91,31 @@ void Main()
         TotalResources = customContext.AllResources.Count
     }.Dump("Layer 5 — Extensibility (bring your own scenario)");
 
+    // ── Layer 6 — Adversarial / edge-case data (valid-but-hostile) ────────────
+    // Same realistic generators, then a seeded decorator perturbs free-text and dates:
+    // unicode/RTL names, leap-year & boundary dates, max-length & injection-like strings.
+    // Validity-preserving by default; every mutation is recorded for replay. The CLI's
+    // --include-invalid emits intentionally-invalid values — how we found a real gap in
+    // our own validator (empty-string primitives).
+    var edgeBuilder = PatientBuilderFactory.Create(schemaProvider, seed: 42)
+        .WithAge(45)
+        .WithEdgeCases(); // edge-case seed derives from the base seed -> reproducible
+    var hostilePatient = edgeBuilder.Build();
+    edgeBuilder.LastEdgeCaseManifest?.Mutations
+        .Select(m => new { m.Category, m.Path, m.Before, m.After })
+        .Dump("Layer 6 — Adversarial / edge-case mutations (replayable manifest)");
+
     "Talk 2 demo complete.".Dump();
 }
 
-// Generate a Patient with a fixed Bogus seed so the id is reproducible across runs.
-static string GeneratePatientWithSeed(IFhirSchemaProvider schema, int seed)
+// Generate a Patient with a seeded faker and return its content JSON (meta stripped),
+// so two same-seed runs can be compared byte-for-byte.
+static string GeneratePatientJson(IFhirSchemaProvider schema, int seed)
 {
-    Randomizer.Seed = new Random(seed);
-    var faker = new SchemaBasedFhirResourceFaker(schema);
+    var faker = new SchemaBasedFhirResourceFaker(schema, seed);
     var patient = faker.Generate("Patient");
-    return patient.Id;
+    patient.MutableNode.Remove("meta");
+    return patient.MutableNode.ToJsonString();
 }
 
 // A reusable, user-defined scenario — exactly the shape of the built-in CommonScenarios.* helpers.

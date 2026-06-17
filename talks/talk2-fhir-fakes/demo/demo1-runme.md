@@ -51,3 +51,23 @@ ignixa-fakes r4 population --out ./output --from Seattle --count 50 --ndjson
 ```
 
 *One NDJSON file per resource type in `./output/` — same data that drove the SQL on FHIR session.*
+
+---
+
+## Beat 5 — Adversarial / edge-case data (Layer 6)
+
+*Same realistic patient, then a seeded pass perturbs free-text and dates — unicode/RTL names, boundary dates, max-length & injection-like strings. Valid-but-hostile by default; a `*.manifest.json` sidecar records every mutation for replay.*
+
+```sh {"name":"beat5-edge-valid","interactive":false}
+ignixa-fakes r4 resource Patient --out ./output --from Seattle --edge-cases --seed 7 --validate
+```
+
+*Note the per-category mutation summary and `✓ Validation passed` — hostile, but still FHIR-valid.*
+
+*Now opt into intentionally-invalid data and watch the validator reject it — the empty-string primitive bug this mode found in our own validator (now fixed).*
+
+```sh {"name":"beat5-edge-invalid","interactive":false}
+ignixa-fakes r4 resource Patient --out ./output --edge-cases --include-invalid --seed 99 --validate
+```
+
+*`✗ INVALID` → `type-1: value must not be empty for FHIR type 'string'`. Layer 5 proves your good data is correct; Layer 6 proves your pipeline survives bad data.*

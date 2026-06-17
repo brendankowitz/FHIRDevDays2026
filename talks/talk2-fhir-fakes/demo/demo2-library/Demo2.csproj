@@ -8,7 +8,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.5" />
-    <PackageReference Include="Ignixa.FhirFakes" Version="0.5.0" />
-    <PackageReference Include="Ignixa.Specification" Version="0.5.0" />
+    <!-- Local build of main (PR #283 merged, not yet published to NuGet) via ./nuget.config local feed.
+         Reset to the published version (>= 0.5.3) and delete nuget.config once a release is cut. -->
+    <PackageReference Include="Ignixa.FhirFakes" Version="0.5.3--no-branch-.2" />
+    <PackageReference Include="Ignixa.Specification" Version="0.5.3--no-branch-.2" />
   </ItemGroup>
 </Project>

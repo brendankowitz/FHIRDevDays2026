@@ -8,7 +8,8 @@ Every FHIR developer hits the same wall: you need realistic test data, and every
 unsatisfying — hand-crafted JSON breaks, production data is a compliance nightmare, and
 Synthea means a JVM and minutes per run. This session introduces a native **.NET** generator
 that produces FHIR-valid synthetic data in **milliseconds**, with a fluent C# API and a
-four-layer architecture — from a single random resource to a census-accurate population.
+layered architecture — from a single random resource, to a census-accurate population, to
+**adversarial valid-but-hostile data** that fuzzes your pipeline.
 
 ## 📂 In this folder
 
@@ -41,10 +42,14 @@ ignixa-fakes r4 scenario DiabeticPatient --out ./output --resolved-references
 
 # A 50-patient population as NDJSON — ready for $import or a SQL on FHIR pipeline
 ignixa-fakes r4 population --out ./output --from Seattle --count 50 --ndjson
+
+# Layer 6 — adversarial valid-but-hostile data (unicode/RTL, boundary dates), then validate it
+ignixa-fakes r4 resource Patient --out ./output --from Seattle --edge-cases --seed 7 --validate
 ```
 
-📜 Full walkthrough (resource → scenario → population): [demo/demo1-cli-script.md](demo/demo1-cli-script.md)
+📜 Full walkthrough (resource → scenario → population → adversarial): [demo/demo1-cli-script.md](demo/demo1-cli-script.md)
 🟢 Run it live in VS Code ([runme.dev](https://runme.dev/) one-click cells): [demo/demo1-runme.md](demo/demo1-runme.md)
+🧪 Layer 6 deep-dive (the bug it found in our own validator): [demo/demo-adversarial.md](demo/demo-adversarial.md)
 
 ### Demo 2 — Library (C#)
 
@@ -55,9 +60,16 @@ cd talks/talk2-fhir-fakes/demo/demo2-library
 dotnet run
 ```
 
-Shows seeded determinism (same seed → same patient), the fluent `ScenarioBuilder`, a full
-metabolic-syndrome lifecycle, and a population cohort. Source:
-[demo2-library/Program.cs](demo/demo2-library/Program.cs)
+Shows **byte-reproducible** seeding (`new SchemaBasedFhirResourceFaker(schema, seed)`), the
+fluent `ScenarioBuilder`, a full metabolic-syndrome lifecycle, a population cohort, a
+bring-your-own-scenario extensibility layer, and **Layer 6** adversarial edge-cases with a
+replayable mutation manifest. Source: [demo2-library/Program.cs](demo/demo2-library/Program.cs)
+
+> ⚠️ **Local main build (temporary):** the edge-case/seeding API ([PR #283](https://github.com/brendankowitz/ignixa-fhir/pull/283))
+> is merged to main but **not yet published to NuGet** (release is a manual workflow).
+> The demo pins a local build of main via [`demo2-library/nuget.config`](demo/demo2-library/nuget.config);
+> the `.linq` version needs that same folder added as a LINQPad package source (Preferences → NuGet,
+> show pre-release). Reset both to the published version (≥ 0.5.3) once a release is cut.
 
 ## 🔗 Learn more
 

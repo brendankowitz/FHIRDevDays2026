@@ -1,5 +1,6 @@
-using Bogus;
 using Ignixa.FhirFakes;
+using Ignixa.FhirFakes.Builders;
+using Ignixa.FhirFakes.EdgeCases;
 using Ignixa.FhirFakes.Lifecycle;
 using Ignixa.FhirFakes.Population;
 using Ignixa.FhirFakes.Scenarios;
@@ -14,21 +15,23 @@ var schemaProvider = FhirVersion.R4.GetSchemaProvider();
 // ─────────────────────────────────────────────────────────────────────────────
 Console.WriteLine("=== Layer 1: Seeded Determinism ===");
 
-static string GeneratePatientWithSeed(IFhirSchemaProvider schema, int seed)
+// First-class seeding (PR #283): pass the seed straight to the faker — no global
+// Randomizer.Seed static. Same seed => byte-identical JSON, excluding only the
+// server-managed meta.lastUpdated wall-clock value.
+static string GeneratePatientJson(IFhirSchemaProvider schema, int seed)
 {
-    Randomizer.Seed = new Random(seed);
-    var faker = new SchemaBasedFhirResourceFaker(schema);
+    var faker = new SchemaBasedFhirResourceFaker(schema, seed);
     var patient = faker.Generate("Patient");
-    return patient.Id;
+    patient.MutableNode.Remove("meta"); // drop lastUpdated so the comparison is content-only
+    return patient.MutableNode.ToJsonString();
 }
 
-var id1a = GeneratePatientWithSeed(schemaProvider, 42);
-Console.WriteLine($"Run 1 (seed=42) Patient.id = {id1a}");
+var json1a = GeneratePatientJson(schemaProvider, 42);
+var json1b = GeneratePatientJson(schemaProvider, 42);
 
-var id1b = GeneratePatientWithSeed(schemaProvider, 42);
-Console.WriteLine($"Run 2 (seed=42) Patient.id = {id1b}");
-
-Console.WriteLine($"Deterministic: {id1a == id1b}");
+Console.WriteLine($"Run 1 (seed=42): {json1a.Length} chars");
+Console.WriteLine($"Run 2 (seed=42): {json1b.Length} chars");
+Console.WriteLine($"Byte-identical (excl. meta.lastUpdated): {json1a == json1b}");
 Console.WriteLine();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -95,6 +98,31 @@ Console.WriteLine($"Scenario    : AnnualDiabeticReview (user-defined)");
 Console.WriteLine($"Encounters  : {customContext.Encounters.Count}");
 Console.WriteLine($"Observations: {customContext.Observations.Count}");
 Console.WriteLine($"Total resources: {customContext.AllResources.Count}");
+Console.WriteLine();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Layer 6 — Adversarial / edge-case data (valid-but-hostile)
+// ─────────────────────────────────────────────────────────────────────────────
+// Same realistic generators, then a seeded decorator perturbs free-text and dates:
+// unicode/RTL names, leap-year & boundary dates, max-length & injection-like strings.
+// Validity-preserving by default; every mutation is recorded for replay. The CLI's
+// --include-invalid goes one step further and emits intentionally-invalid values —
+// that mode is how we found a real gap in our own validator (empty-string primitives).
+Console.WriteLine("=== Layer 6: Adversarial / edge-case data ===");
+
+var edgeBuilder = PatientBuilderFactory.Create(schemaProvider, seed: 42)
+    .WithAge(45)
+    .WithEdgeCases(); // edge-case seed derives from the base seed -> end-to-end reproducible
+var hostilePatient = edgeBuilder.Build();
+var manifest = edgeBuilder.LastEdgeCaseManifest;
+
+Console.WriteLine($"Patient id  : {hostilePatient.Id}");
+Console.WriteLine($"Mutations   : {manifest?.Mutations.Count ?? 0}");
+foreach (var m in manifest?.Mutations ?? Enumerable.Empty<MutationRecord>())
+{
+    Console.WriteLine($"  {m.Category,-26} @ {m.Path}");
+    Console.WriteLine($"      {m.Before}  ->  {m.After}");
+}
 Console.WriteLine();
 
 // ─────────────────────────────────────────────────────────────────────────────
